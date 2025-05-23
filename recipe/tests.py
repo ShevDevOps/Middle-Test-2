@@ -82,3 +82,50 @@ class MainViewTest(TestCase):
         self.assertContains(response, self.recipe5.category.name)
 
 
+class CategoryListViewTest(TestCase):
+    def setUp(self):
+        self.category_a = Category.objects.create(name='Category A')
+        self.category_b = Category.objects.create(name='Category B')
+        self.category_c = Category.objects.create(name='Category C')
+
+        Recipe.objects.create(title='Recipe 1', description='Desc', instructions='Inst', ingredients='Ing', category=self.category_a)
+        Recipe.objects.create(title='Recipe 2', description='Desc', instructions='Inst', ingredients='Ing', category=self.category_a)
+        Recipe.objects.create(title='Recipe 3', description='Desc', instructions='Inst', ingredients='Ing', category=self.category_b)
+        Recipe.objects.create(title='Recipe 4', description='Desc', instructions='Inst', ingredients='Ing', category=self.category_b)
+        Recipe.objects.create(title='Recipe 5', description='Desc', instructions='Inst', ingredients='Ing', category=self.category_b)
+
+    def test_category_list_view_uses_correct_template(self):
+        response = self.client.get(reverse('categories'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'category_list.html')
+
+    def test_category_list_view_displays_all_categories_with_recipe_counts(self):
+        response = self.client.get(reverse('categories'))
+        self.assertEqual(response.status_code, 200)
+
+        categories_in_context = response.context['categories']
+        self.assertEqual(len(categories_in_context), 3)
+
+        category_a_from_context = next(c for c in categories_in_context if c.name == 'Category A')
+        self.assertEqual(category_a_from_context.recipe_count, 2)
+
+        category_b_from_context = next(c for c in categories_in_context if c.name == 'Category B')
+        self.assertEqual(category_b_from_context.recipe_count, 3)
+
+        category_c_from_context = next(c for c in categories_in_context if c.name == 'Category C')
+        self.assertEqual(category_c_from_context.recipe_count, 0)
+
+        self.assertContains(response, 'Category A')
+        self.assertContains(response, '<span class="badge bg-primary rounded-pill">2</span>')
+        self.assertContains(response, 'Category B')
+        self.assertContains(response, '<span class="badge bg-primary rounded-pill">3</span>')
+        self.assertContains(response, 'Category C')
+        self.assertContains(response, '<span class="badge bg-primary rounded-pill">0</span>')
+
+    def test_category_list_view_empty_categories(self):
+        Category.objects.all().delete()
+        response = self.client.get(reverse('categories'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Recipe Categories')
+        self.assertContains(response, 'No categories found.')
+        self.assertNotContains(response, 'Category A')
