@@ -62,4 +62,15 @@ class MainViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'main.html')
 
+    def test_main_view_displays_latest_five_recipes(self):
+        response = self.client.get(reverse('main'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['recipes']), 5)
+        self.assertIn(self.recipe6, response.context['recipes'])
+        self.assertIn(self.recipe5, response.context['recipes'])
+        self.assertIn(self.recipe4, response.context['recipes'])
+        self.assertIn(self.recipe3, response.context['recipes'])
+        self.assertIn(self.recipe2, response.context['recipes'])
+        self.assertNotIn(self.recipe1, response.context['recipes'])
+
     
