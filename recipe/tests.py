@@ -73,4 +73,12 @@ class MainViewTest(TestCase):
         self.assertIn(self.recipe2, response.context['recipes'])
         self.assertNotIn(self.recipe1, response.context['recipes'])
 
-    
+    def test_main_view_recipe_content_in_html(self):
+        response = self.client.get(reverse('main'))
+        self.assertContains(response, self.recipe5.title)
+        self.assertContains(response, self.recipe5.description)
+        self.assertContains(response, self.recipe5.ingredients)
+        self.assertContains(response, self.recipe5.instructions)
+        self.assertContains(response, self.recipe5.category.name)
+
+
