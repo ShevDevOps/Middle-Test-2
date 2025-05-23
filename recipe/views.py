@@ -3,4 +3,4 @@ from django.shortcuts import render
 
 def main(request):
     recipes = Recipe.objects.all()[:5]
-    return render(request, 'recipe/main.html', {'recipes': recipes})
+    return render(request, 'main.html', {'recipes': recipes})
