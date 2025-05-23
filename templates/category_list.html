@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Категорії рецептів</title>
+</head>
+<body>
+    <h1>Список категорій</h1>
+    <ul>
+        {% for category in categories %}
+            <li>
+                {{ category.name }} — {{ category.recipe_count }} рецепт(ів)
+            </li>
+        {% empty %}
+            <li>Категорії відсутні.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
