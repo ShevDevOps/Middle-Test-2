@@ -8,5 +8,5 @@ def category_list(request):
     return render(request, 'category_list.html', {'categories': categories})
   
 def main(request):
-    recipes = Recipe.objects.all()[:5]
+    recipes = Recipe.objects.all('-created_at')[:5]
     return render(request, 'main.html', {'recipes': recipes})
